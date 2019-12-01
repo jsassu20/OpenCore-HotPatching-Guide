@@ -17,11 +17,11 @@
 
 #### SSDT Disable Patch Example
 
--SD card of dell Latitude5480 belongs to PCI device, the device path is: `_SB.PCI0.RP01.PXSX`
+- SD card of dell Latitude5480 belongs to PCI device, the device path is: `_SB.PCI0.RP01.PXSX`
 
--Patch files：***SSDT-RP01.PXSX-disbale*** 
+- Patch files：***SSDT-RP01.PXSX-disbale*** 
 
-- ```
+```
       External (_SB.PCI0.RP01, DeviceObj)
       Scope (_SB.PCI0.RP01)
       {
@@ -40,7 +40,7 @@
               \_SB.PCI0.RP01.DDDD = One
           }
       }
-  ```
+```
 
 #### Note
 
