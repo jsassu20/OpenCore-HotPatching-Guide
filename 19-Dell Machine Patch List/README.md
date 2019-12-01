@@ -1,6 +1,6 @@
-# 综合补丁更名
+# Rename the comprehensive patch
 
-使用综合补丁必须对 `_PTS` 和 `_WAK` 更名。依据原始 DSDT 内容选择正确的更名，如：
+`_PTS` and` _WAK` must be renamed to use a comprehensive patch. Choose the correct rename based on the original DSDT content, such as:
 
 - `_PTS` to `ZPTS(1,N)`:
 
