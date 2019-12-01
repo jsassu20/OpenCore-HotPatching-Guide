@@ -1,12 +1,12 @@
-# 注入X86
+# Inject X86
 
-## 描述
+## Description
 
-注入 X86，实现 CPU 电源管理。
+Inject X86 for CPU power management.
 
-## 使用说明
+## Instructions for use
 
-- DSDT中搜索 `Processor`，如：
+-Search for `Processor` in DSDT, such as:
 
   ```Swift
       Scope (_PR)
@@ -22,9 +22,9 @@
       }
   ```
 
-  根据查询结果，选择注入文件 ***SSDT-PLUG-_PR.CPU0*** 
+According to the query result, select the injection file ***SSDT-PLUG-_PR.CPU0***
 
-  再如：
+   Another example:
 
   ```Swift
       Scope (_SB)
@@ -48,10 +48,10 @@
       }
   ```
 
-  根据查询结果，选择注入文件：***SSDT-PLUG-_SB.PR00*** 
+According to the query results, select the injection file: *** SSDT-PLUG-_SB.PR00 ***
 
-- 如果查询结果和补丁文件名**无法对应**，请任选一个文件作为样本，自行修改文件内容。
+- If the query result does not correspond to the patch file name **, please select a file as a sample and modify the file content yourself.
 
-## 注意
+## Note
 
-2 代，3 代机器无需注入 X86。
+X86 is not required for 2nd and 3rd generation machines.
