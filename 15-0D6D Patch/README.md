@@ -3,9 +3,13 @@
 ## Overview
 
 - `_PRW` defines a component's wakeup method. Its `Return` is a data packet consisting of 2 or more bytes. For details on `_PRW`, see the ACPI specification.
+
 - There are some parts, because their `_PRW` conflicts with macOS and the machine is immediately awakened as soon as it sleeps successfully. To solve the problem, patches must be applied to these components. The first byte of these `_PRW` packets is` 0D` or `6D`. Therefore, this kind of patch is called `0D / 6D patch`, also called` second wake up patch`, also called `wake up and wake up patch`. For the convenience of description, the following are collectively called `0D / 6D patches`.
+
 - The second byte of the `_PRW` packet is mostly` 03` or `04`. Modifying this byte to` 0` completes the `0D / 6D patch`.
+
 - Different machines may define `_PRW` differently, and the content and form of their data packets may also be diverse. The actual `0D / 6D patch` should be determined on a case- by- case basis. See description later.
+
 - We expect that future versions of OpenCore will solve the `0D / 6D` problem.
 
 ### Components that may require `0D / 6D Patch`
