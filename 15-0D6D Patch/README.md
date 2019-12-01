@@ -73,36 +73,32 @@ This type of `0D / 6D patch` is suitable for modifying` 0x03` (or `0x04`) to` 0x
 
 -`Method type` two:` Scope`
 
-  ```Swift
-        Scope (_SB.PCI0.XHC)
+```Swift
+Scope(_SB.pci0.xhc)
+{
+    Method(_PRW, 0, NotSerialized)
+    {
+        If((Int(Local0) == 0x03))
         {
-            Method (_PRW, 0, NotSerialized)
+            Return(Package(0x02)
             {
-                ...
-                If ((Local0 == 0x03))
-                {
-                    Return (Package (0x02)
-                    {
-                        0x6D,
-                        0x03
-                    })
-                }
-                If ((Local0 == One))
-                {
-                    Return (Package (0x02)
-                    {
-                        0x6D,
-                        One
-                    })
-                }
-                Return (Package (0x02)
-                {
-                    0x6D,
-                    Zero
-                })
+                0x6d, 0x03
             }
         }
-  ```
+        If((Local0 == One))
+        {
+            Return(Package(0x02)
+            do {
+                0x6d, One
+            }
+        }
+        Return(Package(0x02)
+        {
+            0x6d, Zero
+        }
+    }
+}
+```
 
 This situation is not common. For the example case, use the binary rename ***Name6D- 03 to 00***. Try other forms of content yourself.
 
