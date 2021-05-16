@@ -1,59 +1,59 @@
-# ACPI 表单
+# ACPI Form
 
-### 简述
+### Brief description
 
-- ACPI（Advanced Configuration & Power Interface）是电脑高级配置和电源接口，它是由Intel，Microsoft等厂商共同制定的一种电源管理标准，即 [`ACPI规范`](https://www.acpica.org/documentation) 。每台电脑出厂时都会提供符合 [`ACPI规范`](https://www.acpica.org/documentation) 的一组二进制文件，这些文件我们称之为 ACPI 表单。ACPI 表单的数量和内容随机器不同而不同，亦随BIOS版本不同而 **可能** 不同。ACPI 表单包括：
-  - 1个 DSDT.aml
-  - 多个 SSDT-***.aml。如： `SSDT-SataAhci.aml` 、 `SSDT-CpuSsdt.aml` 、 `SSDT-CB-01.aml` 等等
-  - 其他 aml。如： `APIC.aml` 、 `BGRT.aml` 、 `DMAR.aml` 、 `ECDT.aml` 等等
-- 一些工具软件和引导器可以提取机器的 ACPI 表单，像 windows 下的 Aida64，引导器 clover 等。因为 ACPI 表单是二进制文件，所以我们需要一个反编译软件来帮助我们读懂文件内容，如 MAC 系统的 MaciASL 。当用反编译软件打开这些表单时，特别是打开 DSDT.aml 时，可能会出现很多错误。需要说明的是绝大多数情况下，这些错误是软件反编译过程产生的，机器提供的 ACPI 表单并不存在这些错误。
-- ACPI 表单通过 aml 语言形式来描述机器的硬件信息，它本身没有任何驱动能力。然而，某个硬件的正常工作需要正确的 ACPI，错误的描述方法会导致引导失败或者系统崩溃。比如，机器安插了博通网卡，如果 ACPI 描述为 Intel 网卡，那么系统会加载 Intel 网卡驱动，这显然是错误的。再比如，机器没有提供 `自动调节亮度` 的硬件，即使 ACPI 添加了 `SSDT-ALS0` 也无法实现亮度的自动调节功能。
-- 由于 windows 系统和 MAC 系统的工作原理不同，黑苹果需要修正 ACPI 。正确的 ACPI 是黑苹果稳定工作的基础。 **强烈建议** 使用 `热补丁`【HOTpatch】对 ACPI 实施补丁。 `热补丁` 可以很好的规避所谓的 DSDT 错误。
-- 有关 ACPI 的详细内容请查看 [`ACPI规范`](https://www.acpica.org/documentation) ；有关 aml 语言的介绍请参阅《ASL语法基础》。
-- 本章 `ACPI 补丁` 仅适用于 `OpenCore` 
+-ACPI (Advanced Configuration & Power Interface) is a computer's advanced configuration and power interface. It is a power management standard jointly developed by Intel, Microsoft and other manufacturers, namely [`ACPI Specification`](https://www.acpica. org/documentation). Each computer will be provided with a set of binary files conforming to the [`ACPI specification`](https://www.acpica.org/documentation) when it leaves the factory. These files are called ACPI forms. The number and content of ACPI tables vary from device to device, and **may** vary with the BIOS version. The ACPI form includes:
+  -1 DSDT.aml
+  -Multiple SSDT-***.aml. Such as: `SSDT-SataAhci.aml`, `SSDT-CpuSsdt.aml`, `SSDT-CB-01.aml` etc.
+  -Other aml. Such as: `APIC.aml`, `BGRT.aml`, `DMAR.aml`, `ECDT.aml`, etc.
+-Some tools and booters can extract the ACPI form of the machine, such as Aida64 under windows, clover and so on. Because the ACPI form is a binary file, we need a decompiler to help us understand the content of the file, such as MaciASL of the MAC system. When opening these forms with decompilation software, especially when opening DSDT.aml, many errors may appear. It should be noted that in most cases, these errors are caused by the software decompilation process, and the ACPI sheet provided by the machine does not contain these errors.
+-The ACPI form describes the hardware information of the machine in the form of aml language, and it does not have any driving capability. However, the normal operation of a certain hardware requires correct ACPI, and the wrong description method can lead to boot failure or system crash. For example, if a Broadcom network card is installed in the machine, if ACPI is described as an Intel network card, then the system will load the Intel network card driver, which is obviously wrong. For another example, the machine does not provide hardware for `automatic brightness adjustment`, even if ACPI adds `SSDT-ALS0`, it cannot realize the automatic brightness adjustment function.
+-Due to the different working principles of the windows system and the MAC system, the black apple needs to correct the ACPI. The correct ACPI is the basis for the stable work of the Black Apple. **Strongly recommended** Use `Hot Patch`[HOTpatch] to apply a patch to ACPI. `Hot Patches` can avoid so-called DSDT errors.
+-For details of ACPI, please refer to [`ACPI Specification`](https://www.acpica.org/documentation); for introduction of aml language, please refer to "ASL Grammar Basics".
+-This chapter `ACPI Patch` only applies to `OpenCore`
 
-### ACPI 补丁
+### ACPI Patch
 
-- DSDT 补丁和 SSDT 补丁
+-DSDT patch and SSDT patch
 
-  这部分内容参考《OC-little》其他章节。
+  This part of the content refers to other chapters of "OC-little".
 
-- 其他表单补丁
+-Other form patches
 
-  - **清除 ACPI 的 `header fields`** 
-    - **补丁方法**：`ACPI\Quirks\NormalizeHeaders` = `true` 
-    - **说明**：只有 Mac 10.13 才需要这个补丁
-  - **重新定位 ACPI 内存区域** 
-    - **补丁方法**：`ACPI\Quirks\RebaseRegions` = `true` 
-    - **说明**：ACPI 表单的内存区域既有动态分配的地址，也有固定分配的地址。补丁的作用是 **重新定位 ACPI 内存区域** ，这个操作非常危险，除非这个补丁可以解决引导崩溃问题，否则不要选用它。
-  - **FACP.aml** 
+  -**Clear ACPI's `header fields`**
+    -**Patch method**: `ACPI\Quirks\NormalizeHeaders` = `true`
+    -**Note**: This patch is only required for Mac 10.13
+  -**Relocate ACPI memory area**
+    -**Patch method**: `ACPI\Quirks\RebaseRegions` = `true`
+    -**Explanation**: The memory area of ​​the ACPI sheet has both dynamically allocated addresses and fixedly allocated addresses. The function of the patch is to **relocate the ACPI memory area**, this operation is very dangerous, unless this patch can solve the boot crash problem, otherwise do not use it.
+  -**FACP.aml**
     
-    - **补丁方法**：`ACPI\Quirks\FadtEnableReset` = `true` 
+    -**Patch method**: `ACPI\Quirks\FadtEnableReset` = `true`
     
-    - **说明**：[`ACPI规范`](https://www.acpica.org/documentation) 以 **FADT** 来定义与配置和电源管理相关的各种静态系统信息，在机器的 ACPI 表单中以 **FACP.aml** 表单出现。 **FACP.aml** 表单表征的信息有 RTC时钟，电源和睡眠按键，电源管理等。目前和黑苹果有关的有以下几个方面：
+    -**Description**: [`ACPI Specification`](https://www.acpica.org/documentation) Use **FADT** to define various static system information related to configuration and power management. ACPI form appears as **FACP.aml** form. **FACP.aml** The information represented by the form includes RTC clock, power and sleep buttons, power management, etc. The following aspects are currently related to black apples:
     
-    - 重启和关机不正常的，尝试使用本补丁
+    -If the restart and shutdown are abnormal, try to use this patch
       
-    - 按下 **电源键** 无法呼出 “重新启动、睡眠、取消、关机” 菜单的，尝试使用本补丁
+    -If you cannot call out the "Restart, Sleep, Cancel, Shutdown" menu by pressing the **power button**, try using this patch
       
-      **注意**：如果 `ACPI\Quirks\FadtEnableReset` = `true` 依然无法呼出 “重新启动、睡眠、取消、关机” 菜单，尝试添加 ***SSDT-PMCR*** 。 ***SSDT-PMCR*** 位于 OC-little 的《添加缺失的部件》。
+      **Note**: If `ACPI\Quirks\FadtEnableReset` = `true` still cannot call the "Restart, Sleep, Cancel, Shutdown" menu, try to add ***SSDT-PMCR***. ***SSDT-PMCR*** is located in "Add Missing Parts" on OC-little.
       
-    - **FACP.aml** 表单的 `Low Power S0 Idle` 、`Hardware Reduced` 表征了机器类型，决定了电源管理方式。如果 `Low Power S0 Idle` = `1` 则表明机器属于 `AOAC` 。有关 `AOAC` 方面的内容参见《关于AOAC》。
+    -The `Low Power S0 Idle` and `Hardware Reduced` in the **FACP.aml** form represent the machine type and determine the power management method. If `Low Power S0 Idle` = `1`, it means that the machine belongs to `AOAC`. For the content of `AOAC`, please refer to "About AOAC".
     
-  - **FACS.aml** 
-    - **补丁方法**：`ACPI\Quirks\ResetHwSig` = `true` 
-    - **说明**：**FACS.aml** 表单的 `Hardware Signature` 项是4字节的硬件签名，是系统引导后根据基本硬件配置计算得出的。如果机器从 **休眠** 状态 **唤醒** 后这个值发生了改变系统将无法正确恢复。补丁的作用是使 `Hardware Signature` = `0` 尝试解决上述问题。
-    - **注意：**如果系统已经禁用了 **休眠** 就无需理会该补丁
-  - **BGRT.aml** 
-    - **补丁方法**：`ACPI\Quirks\ResetLogoStatus` = `true` 
-    - **说明**：**BGRT.aml** 表单是引导图形资源表。根据 [`ACPI规范`](https://www.acpica.org/documentation) ，表单的 `Displayed` 项应该 = `0` 。但是部分厂商出于某个原因 `Displayed` 项写入了非零数据，这可能导致引导阶段屏幕刷新失败。补丁的作用是使 `Displayed` = `0` 。
-    - **注意：**并非所有机器都有这个表单
-  - **DMAR.aml** 
-    - **补丁方法**：`Kernel\Quirks\DisableIoMapper` = `true` 
-    - **说明**：补丁的作用同 BIOS 禁止 `VT-d` 或者 Drop **DMAR.aml** 
-    - **注意**：只有早期 Mac 系统才需要这个补丁
-  - **ECDT.aml** 
+  -**FACS.aml**
+    -**Patch method**: `ACPI\Quirks\ResetHwSig` = `true`
+    -**Description**: The `Hardware Signature` item in the **FACS.aml** form is a 4-byte hardware signature, which is calculated based on the basic hardware configuration after the system is booted. If this value changes after the machine is in the **sleep** state **waking up**, the system will not be able to recover correctly. The purpose of the patch is to make `Hardware Signature` = `0` to try to solve the above problems.
+    -**Note: **If the system has disabled **hibernation**, don't bother about the patch
+  -**BGRT.aml**
+    -**Patch method**: `ACPI\Quirks\ResetLogoStatus` = `true`
+    -**Description**: **BGRT.aml** form is a guide graphic resource form. According to [`ACPI Specification`](https://www.acpica.org/documentation), the `Displayed` item of the form should = `0`. However, some manufacturers have written non-zero data in the `Displayed` item for some reason, which may cause the screen refresh failure during the boot phase. The effect of the patch is to make `Displayed` = `0`.
+    -**Note:** Not all machines have this form
+  -**DMAR.aml**
+    -**Patch method**: `Kernel\Quirks\DisableIoMapper` = `true`
+    -**Note**: The function of the patch is the same as that of BIOS prohibiting `VT-d` or Drop **DMAR.aml**
+    -**Note**: This patch is only required for earlier Mac systems
+  -**ECDT.aml**
     
-    - **补丁方法**：全局更名使所有 ACPI 表单的 `EC` 名称、路径和 `Namepath` 一致
-    - **说明**：个别机器（如 **Lenovo yoga-s740**）的 **ECDT.aml** 表单的 `Namepath` 与其他 ACPI 表单的 `EC` 名称不一致，这会导致机器在引导过程中出现 ACPI 错误。本补丁方法可以较好的解决 ACPI 报错问题。
-    - **注意**：并非所有机器都有这个表单
+    -**Patch method**: Globally rename the `EC` name and path of all ACPI forms to be consistent with `Namepath`
+    -**Explanation**: The namepath of the **ECDT.aml** form of individual machines (such as **Lenovo yoga-s740**) is inconsistent with the `EC` names of other ACPI forms, which will cause the machine to boot An ACPI error occurred during the process. This patch method can better solve the ACPI error reporting problem.
+    -**Note**: Not all machines have this form

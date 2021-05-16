@@ -1,65 +1,65 @@
-# AOAC 总述
+# AOAC Overview
 
-## AOAC 技术
+## AOAC Technology
 
-- 新的笔记本电脑引入了一项新技术—— `AOAC` ，即：*Always On/Always Connected* 。 `AOAC` 由 `Intel` 公司提出，旨在电脑在睡眠或者休眠模式下仍然保持网络连接及资料传输。简单的说，  `AOAC` 的引入使笔记本像我们的手机一样，永不关机，永远在线。
+-The new laptop introduces a new technology-`AOAC`, namely: *Always On/Always Connected*. `AOAC` was proposed by the `Intel` company, aiming to maintain the network connection and data transmission when the computer is in sleep or hibernation mode. Simply put, the introduction of `AOAC` makes the notebook, like our mobile phone, never shut down and always online.
 
-### `AOAC` 机器的判断方法
+### How to judge `AOAC` machine
 
-- 用 MaciASL 打开 `ACPI` 的 `FACP.aml` ，搜索 `Low Power S0 Idle` ，如果=1即属于 `AOAC` 机器。如：
+-Open `FACP.aml` of `ACPI` with MaciASL, search for `Low Power S0 Idle`, if =1, it belongs to `AOAC` machine. Such as:
 
   ```asl
-  Low Power S0 Idle (V5) : 1
+  Low Power S0 Idle (V5): 1
   ```
 
-- 有关 `AOAC` 方面的内容请百度 `AOAC` 、 `联想AOAC` 、 `AOAC网卡` 等。
+-For the content of `AOAC`, please Baidu `AOAC`, `Lenovo AOAC`, `AOAC network card`, etc.
 
-## AOAC 问题
+## AOAC problem
 
-### 睡眠失败问题
+### Sleep failure problem
 
-- 由于 `AOAC` 和 `S3` 本身相矛盾，采用了 `AOAC` 技术的机器不具有 `S3` 睡眠功能，如 `Lenovo PRO13` 。这样的机器一旦进入 `S3` 睡眠就会 **睡眠失败** 。 **睡眠失败** 主要表现为：睡眠后无法被唤醒，呈现死机状态，只能强制关机。**睡眠失败** 本质是机器一直停滞在睡眠过程，始终没有睡眠成功。
-- 有关 `S3` 睡眠方面内容参见《ACPI 规范》。
+-Due to the contradiction between `AOAC` and `S3`, the machine using `AOAC` technology does not have `S3` sleep function, such as `Lenovo PRO13`. Such a machine will **sleep failure** once it enters the `S3` sleep. **Sleep failure** The main manifestations are: unable to be awakened after sleep, showing a dead state, and can only be forced to shut down. **Sleep failure** The essence is that the machine has been stuck in the sleep process, and has never been able to sleep successfully.
+-Refer to "ACPI Specification" for the contents of `S3` sleep.
 
-### 待机时间问题
+### Standby time problem
 
-- **禁止`S3`睡眠** 可以解决 **睡眠失败** 问题，但是机器将不再睡眠。没有了睡眠随之而来的问题是：在电池供电模式下，机器待机时间大大缩短。比如，在"菜单睡眠"、"自动睡眠"、"盒盖睡眠"等情况下，电池耗电量较大，大约每小时耗电5%--10%。
+-**Forbid `S3`sleep** can solve the **sleep failure** problem, but the machine will no longer sleep. The problem that comes with no sleep is that in battery-powered mode, the machine's standby time is greatly reduced. For example, in the case of "menu sleep", "auto sleep", and "lid sleep", the battery consumes a lot of power, about 5%-10% per hour.
 
-## AOAC解决方案
+## AOAC solution
 
-- 禁止 `S3` 睡眠
-- 关闭独显的供电电源
-- 电源空闲管理
-- 选择品质较好的 SSD：SLC>MLC>TLC>QLC（不确定）
-- 可能的话更新 SSD 固件以提高电源管理的效能
-- 使用 NVMeFix.kext 开启 SSD 的 APST
-- 启用 ASPM（BIOS 高级选项启用ASPM、补丁启用 L1）
+-Disable `S3` sleep
+-Turn off the power supply of the independent display
+-Power idle management
+-Choose a better quality SSD: SLC>MLC>TLC>QLC (not sure)
+-Update SSD firmware if possible to improve power management performance
+-Use NVMeFix.kext to enable APST of SSD
+-Enable ASPM (BIOS advanced options enable ASPM, patch enable L1)
 
-## AOAC 睡眠、唤醒
+## AOAC sleep, wake up
 
-- `AOAC` 睡眠
+-`AOAC` sleep
 
-  以上方案可以使机器睡眠，这种睡眠叫 `AOAC` 睡眠 。 `AOAC` 睡眠本质是系统、硬件进入了空闲状态，非传统意义上的 `S3` 睡眠。
+  The above scheme can make the machine sleep, this kind of sleep is called `AOAC` sleep. The essence of `AOAC` sleep is that the system and hardware enter the idle state, which is not the traditional sense of `S3` sleep.
 
-- `AOAC` 唤醒
+-`AOAC` wake up
 
-  机器进入 `AOAC` 睡眠后唤醒它会比较困难，通常需要电源键唤醒。某些机器可能需要电源键 + `PNP0C0D` 方法来唤醒机器。
+  It is more difficult for the machine to wake up after entering the `AOAC` sleep, and usually requires the power button to wake it up. Some machines may need the power button + `PNP0C0D` method to wake up the machine.
 
-## AOAC 补丁
+## AOAC Patch
 
-- 禁止 `S3` 睡眠——参见《禁止S3睡眠》
-- 禁用独显补丁——参见《AOAC禁止独显》
-- 电源空闲管理补丁——参见《电源空闲管理》
-- AOAC唤醒补丁——参见《AOAC唤醒方法》
-- 秒醒补丁——参见《060D补丁》
-- 启用设备 LI ——参见《禁止PCI设备及设置ASPM工作模式》中的 《设置ASPM工作模式》，感谢 @iStar丶Forever 提供方法
-- 管控蓝牙WIFI——参见《睡眠自动关闭蓝牙WIFI》，感谢 @i5 ex900 0.66%/h 华星 OC Dreamn 提供方法
+-Prohibit `S3` sleep-see "Prohibit S3 sleep"
+-Disable the independent display patch-see "AOAC prohibits independent display"
+-Power Idle Management Patch-See "Power Idle Management"
+-AOAC wake-up patch-see "AOAC wake-up method"
+-Second wake up patch-see "060D patch"
+-Enable device LI-see "Setting ASPM Working Mode" in "Prohibiting PCI Devices and Setting ASPM Working Mode", thanks @iStar丶Forever for providing the method
+-Control Bluetooth WIFI-see "Sleep automatically turn off Bluetooth WIFI", thanks to @i5 ex900 0.66%/h Huaxing OC Dreamn for providing the method
 
-## 注意事项
+## Precautions
 
-- `AOAC` 解决方案是临时解决方案。随着 `AOAC` 技术的广泛应用，可能将来会有更好的解决方法。
-- `AOAC` 睡眠、唤醒和 `S3` 睡眠、唤醒不同，以下补丁不在适用
-  - 《PTSWAK综合扩展补丁》
-  - 《PNP0C0E睡眠修正方法》
-- 同上原因，`AOAC` 睡眠期间无法正确显示工作状态，如睡眠期间无呼吸灯闪烁。
-- 非 `AOAC` 机器也可尝试本方法。
+-The `AOAC` solution is a temporary solution. With the widespread application of `AOAC` technology, there may be better solutions in the future.
+-`AOAC` sleep and wake up are different from `S3` sleep and wake up, the following patches are not applicable
+  -"PTSWAK Comprehensive Extension Patch"
+  -"PNP0C0E Sleep Correction Method"
+-The same reason as above, `AOAC` cannot display the working status correctly during sleep, such as the no breathing light flashes during sleep.
+-Non-`AOAC` machines can also try this method.
