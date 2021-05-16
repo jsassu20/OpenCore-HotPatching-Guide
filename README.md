@@ -1,5 +1,7 @@
 # Daliansky's OC-Little Repo Translated to English
 
+I'M NOT CHINEESE SO THIS SHIT TAKES FOREVER TO TRANSLATE WITH GOOGLE SO BARE WITH ME IF I DON'T KEEP IT UP TO DATE REGULARLY.
+
 https://github.com/daliansky/OC-little
 
 # OpenCore 0.5+ component patch
