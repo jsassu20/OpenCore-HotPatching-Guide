@@ -1,11 +1,11 @@
-# SSDT 补丁加载顺序
+# SSDT patch loading sequence
 
-- 通常情况下，我们的 SSDT 补丁的对象是机器的 ACPI (DSDT 或者其他 SSDT 文件)，这些原始的 ACPI 加载的时间早于我们的 SSDT 补丁。因此，我们的 SSDT 补丁在 `Add` 列表中 **没有顺序要求**。
-- 有这样一种情况，当我们在一个 SSDT 补丁里定义了一个 `Device` 设备，又在另一个 SSDT 补丁里通过 `Scope` 引用这个 `Device`，那么，这两个补丁在 `Add` 列表中 **有顺序要求**。
+-Normally, the object of our SSDT patch is the machine's ACPI (DSDT or other SSDT files). These original ACPIs are loaded earlier than our SSDT patch. Therefore, our SSDT patch is **no order required** in the `Add` list.
+-There is such a situation, when we define a `Device` device in an SSDT patch, and refer to this `Device` through `Scope` in another SSDT patch, then these two patches are in the `Add` list **There are order requirements**.
 
-## 示例
+## Example
 
-- 补丁1：**SSDT-XXXX-1.aml**
+-Patch 1: **SSDT-XXXX-1.aml**
   
   ```Swift
   External (_SB.PCI0.LPCB, DeviceObj)
@@ -18,7 +18,7 @@
   }
   ```
   
-- 补丁2：**SSDT-XXXX-2.aml**
+-Patch 2: **SSDT-XXXX-2.aml**
 
   ```Swift
   External (_SB.PCI0.LPCB.XXXX, DeviceObj)
@@ -31,11 +31,11 @@
     }
   ```
   
-- `Add` 列表要求
+-`Add` list requirements
 
   ```XML
   Item 1
-            path    <SSDT-XXXX-1.aml>
+            path <SSDT-XXXX-1.aml>
   Item 2
-            path    <SSDT-XXXX-2.aml>
+            path <SSDT-XXXX-2.aml>
   ```
