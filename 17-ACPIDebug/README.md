@@ -1,56 +1,56 @@
-# ACPIDebug说明
+# ACPIDebug description
 
-## 描述
+## Description
 
-通过在 ***SSDT-xxxx*** 补丁里添加调试代码，能够在控制台上看到补丁或者 ACPI的工作过程，用于调试补丁。
+By adding debugging code in the ***SSDT-xxxx*** patch, you can see the patch or ACPI working process on the console for debugging the patch.
 
-## 要求
+## Claim
 
-- 驱动
-  - 安装 ***ACPIDebug.kext*** 至 `OC\Kexts`，并添加驱动列表。
-- 补丁
-  - 添加主补丁 ***SSDT-RMDT*** 至 `OC\ACPI`，并添加补丁列表。
-  - 添加 ***自定义补丁*** 至 `OC\ACPI`，并添加补丁列表。
+-Drive
+  -Install ***ACPIDebug.kext*** to `OC\Kexts` and add the driver list.
+-Patch
+  -Add the main patch ***SSDT-RMDT*** to `OC\ACPI`, and add the patch list.
+  -Add ***custom patch*** to `OC\ACPI`, and add the patch list.
 
-## 调试
+## Debug
 
-- 打开 **控制台** ，搜索 **`关键字`** （ **`关键字`** 来自 ***自定义补丁*** ）
-- 观察控制台输出结果
+-Open **Console** and search for **`Keywords`** (**`Keywords`** from ***Custom Patches***)
+-Observe the console output
 
-## 示例
+## Example
 
-- 目的
+-Purpose
 
-  - 观察机器睡眠、唤醒后， `ACPI` 的 `_PTS`、`_WAK` 接收 `Arg0` 的情况。
+  -Observe how the `_PTS` and `_WAK` of `ACPI` receive `Arg0` after the machine sleeps and wakes up.
 
-- 驱动和补丁
+-Drivers and patches
 
-  - ***ACPIDebug.kext*** ——见前文
+  -***ACPIDebug.kext***-see above
 
-  - ***SSDT-RMDT*** ——见前文
+  -***SSDT-RMDT***-see above
 
-  - ***SSDT-PTSWAK*** ——补丁内置了参数传递变量 `\_SB.PCI9.TPTS`、`\_SB.PCI9.TWAK` ，方便其他补丁使用。参见《PTSWAK综合扩展补丁》
+  -***SSDT-PTSWAK*** ——The patch has built-in parameter transfer variables `\_SB.PCI9.TPTS`, `\_SB.PCI9.TWAK`, which is convenient for other patches to use. See "PTSWAK Comprehensive Extension Patch"
 
-  - ***SSDT-BKeyQxx-Debug*** ——本补丁只是范例。补丁内添加了调试代码，能够在按键响应后执行调试代码。实际使用时可以指定亮度快捷键，或者其他按键。
+  -***SSDT-BKeyQxx-Debug*** ——This patch is just an example. Debugging code has been added to the patch, which can execute the debugging code after the key is responded. In actual use, you can specify the brightness shortcut keys or other keys.
 
-    **注**：以上补丁所要求的更名在对应补丁文件的注释里。
+    **Note**: The name change required by the above patch is in the comment of the corresponding patch file.
 
-- 观察控制台输出结果
+-Observe the console output
 
-  - 打开控制台，搜索 `ABCD-`
+  -Open the console and search for `ABCD-`
 
-  - 完成一次睡眠、唤醒过程
+  -Complete a sleep and wake up process
 
-  - 按下 ***SSDT-BKeyQxx-Debug*** 指定的键，观察控制台输出结果。一般情况下，显示结果如下：
+  -Press the key specified by ***SSDT-BKeyQxx-Debug*** and observe the console output. Under normal circumstances, the display results are as follows:
 
     ```log
-    13:19:50.542733+0800  kernel  ACPIDebug: { "ABCD-_PTS-Arg0=", 0x3, }
-    13:19:55.541826+0800  kernel  ACPIDebug: { "ABCD-_WAK-Arg0=", 0x3, }
+    13:19:50.542733+0800 kernel ACPIDebug: {"ABCD-_PTS-Arg0=", 0x3,}
+    13:19:55.541826+0800 kernel ACPIDebug: {"ABCD-_WAK-Arg0=", 0x3,}
     ```
 
-    以上显示结果是最近一次睡眠、唤醒后 `Arg0` 的值。
+    The above display result is the value of `Arg0` after the last sleep and wake-up.
 
-## 备注
+## Remarks
 
-- Debug调试代码可以多样化，如：`\RMDT.P1`, `\RMDT.P2`, `\RMDT.P3` 等等，详见 ***SSDT-RMDT.dsl***
-- 以上驱动、主要补丁来自 [@RehabMan](https://github.com/rehabman)
+-Debug code can be diversified, such as: `\RMDT.P1`, `\RMDT.P2`, `\RMDT.P3`, etc., see ***SSDT-RMDT.dsl*** for details
+-The above drivers and main patches are from [@RehabMan](https://github.com/rehabman)
