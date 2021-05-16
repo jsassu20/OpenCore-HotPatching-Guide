@@ -1,4 +1,4 @@
-# 保留部件
+# Reserved parts
 
-- 新的 PS2 驱动已经支持亮度快捷键，不再需要《亮度快捷键》部件
-- 《CMOS重置补丁》和《声卡IRQ补丁》不再适用
+-The new PS2 driver already supports brightness shortcuts, and the "Brightness Shortcuts" component is no longer needed
+-"CMOS Reset Patch" and "Sound Card IRQ Patch" are no longer applicable
