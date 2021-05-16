@@ -1,5 +1,5 @@
-# 注入设备
+# Injection device
 
-- 注入 `x86` 实现 `CPU` 电源管理
-- 注入 `PNLF` 实现亮度调节
-- 注入 `SBUS` 设备
+-Inject `x86` to achieve `CPU` power management
+-Inject `PNLF` to realize brightness adjustment
+-Inject the `SBUS` device
