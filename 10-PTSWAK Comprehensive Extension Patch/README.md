@@ -1,86 +1,86 @@
-# 综合补丁
+# Comprehensive patch
 
-## 描述
+## Description
 
-- 通过对 `_PTS` 和 `_WAK` 更名，加上综合补丁和它的扩展补丁，解决某些机器睡眠或唤醒过程中出现一些问题。
+-By renaming `_PTS` and `_WAK`, adding comprehensive patches and its extended patches, some problems in the sleep or wake-up process of some machines have been solved.
 
-- 综合补丁是一个框架，它包括：
-  - 屏蔽独显接口 `_ON`, `_OFF`。
-  - 6 个扩展补丁接口 `EXT1`, `EXT2`, `EXT3`, `EXT4` , `EXT5` 和 `EXT6`。
-  - 定义强制睡眠传递参数 `FNOK` 和 `MODE` ，详见《PNP0C0E睡眠修正方法》。
-  - 定义调试参数 `TPTS` 和 `TWAK` ，用于在睡眠和唤醒过程中，侦测、跟踪 `Arg0` 变化。比如，在亮度快捷键补丁里添加以下代码：
+-Comprehensive patch is a framework which includes:
+  -Shield the independent display interface `_ON`, `_OFF`.
+  -6 extension patch interfaces `EXT1`, `EXT2`, `EXT3`, `EXT4`, `EXT5` and `EXT6`.
+  -Define mandatory sleep transfer parameters `FNOK` and `MODE`, see "PNP0C0E Sleep Correction Method" for details.
+  -Define the debugging parameters `TPTS` and `TWAK`, which are used to detect and track the changes of `Arg0` during sleep and wake-up. For example, add the following code to the brightness shortcut patch:
 
     ```Swift
     ...
-    /* 某按键： */
+    /* A key: */
     \RMDT.P2 ("ABCD-_PTS-Arg0=", \_SB.PCI9.TPTS)
     \RMDT.P2 ("ABCD-_WAK-Arg0=", \_SB.PCI9.TWAK)
     ...
     ```
 
-    当按下亮度快捷键后，能够在控制台上看到前一次睡眠、唤醒后 `Arg0` 的值。
+    When you press the brightness shortcut key, you can see the value of `Arg0` after the previous sleep and wake-up on the console.
 
-    注：调试ACPI需要安装驱动 ACPIDebug.kext，添加补丁 SSDT-RMDT，以及自定义的调试补丁。具体方法参见《ACPIDebug》。
+    Note: To debug ACPI, you need to install the driver ACPIDebug.kext, add the patch SSDT-RMDT, and customize the debug patch. See "ACPIDebug" for specific methods.
 
-## 更名
+## Rename
 
-使用综合补丁必须对 `_PTS` 和 `_WAK` 更名。依据原始 DSDT 内容选择正确的更名，如：
+To use the integrated patch, you must rename `_PTS` and `_WAK`. Choose the correct name change based on the original DSDT content, such as:
 
-- `_PTS` to `ZPTS(1,N)`:
+-`_PTS` to `ZPTS(1,N)`:
 
   ```Swift
-    Method (_PTS, 1, NotSerialized)  /* _PTS: Prepare To Sleep */
+    Method (_PTS, 1, NotSerialized) /* _PTS: Prepare To Sleep */
     {
   ```
 
-- `_WAK` to `ZWAK(1,N)`:
+-`_WAK` to `ZWAK(1,N)`:
 
   ```Swift
-    Method (_WAK, 1, NotSerialized)  /* _WAK: Wake */
+    Method (_WAK, 1, NotSerialized) /* _WAK: Wake */
     {
   ```
 
-- `_PTS` to `ZPTS(1,S)`:
+-`_PTS` to `ZPTS(1,S)`:
 
   ```Swift
-    Method (_PTS, 1, Serialized)  /* _PTS: Prepare To Sleep */
+    Method (_PTS, 1, Serialized) /* _PTS: Prepare To Sleep */
     {
   ```
 
-- `_WAK` to `ZWAK(1,S)`:
+-`_WAK` to `ZWAK(1,S)`:
 
   ```Swift
-    Method (_WAK, 1, Serialized)  /* _WAK: Wake */
+    Method (_WAK, 1, Serialized) /* _WAK: Wake */
     {
   ```
 
-如果 DSDT 中存在 `_TTS` 也需要对其更名；如果不存在，则无需更名。依据原始 DSDT 内容选择正确的更名，如：
+If `_TTS` exists in the DSDT, it needs to be renamed; if it does not exist, there is no need to rename it. Choose the correct name change based on the original DSDT content, such as:
 
-- `_TTS` to `ZTTS(1,N)`:
+-`_TTS` to `ZTTS(1,N)`:
 
   ```Swift
-    Method (_TTS, 1, NotSerialized)  /* _WAK: Wake */
+    Method (_TTS, 1, NotSerialized) /* _WAK: Wake */
     {
   ```
 
-- `_TTS` to `ZTTS(1,S)`:
+-`_TTS` to `ZTTS(1,S)`:
 
   ```Swift
-    Method (_TTS, 1, Serialized)  /* _WAK: Wake */
+    Method (_TTS, 1, Serialized) /* _WAK: Wake */
     {
   ```
 
 
-## 补丁
+## Patch
 
-- ***SSDT-PTSWAKTTS*** —— 综合补丁。
+-***SSDT-PTSWAKTTS***-Comprehensive patch.
 
-- ***SSDT-EXT1-FixShutdown*** —— `EXT1` 扩展补丁。 修复因 XHC 控制器导致的关机变重启的问题，原理是当 `_PTS` 中传入的参数为 `5` 时将 `XHC.PMEE` 置 0。该补丁与 Clover 的 `FixShutdown` 效果等同。部分 XPS / ThinkPad 机器会需要这个补丁。
+-***SSDT-EXT1-FixShutdown*** —— `EXT1` extension patch. Fix the problem that the XHC controller changes from shutdown to restart. The principle is to set `XHC.PMEE` to 0 when the parameter passed in `_PTS` is `5`. This patch has the same effect as Clover's `FixShutdown`. Some XPS / ThinkPad machines will need this patch.
 
-- ***SSDT-EXT3-WakeScreen*** —— `EXT3` 扩展补丁。解决某些机器唤醒后需按任意键亮屏的问题。使用时应查询 `PNP0C0D` 设备名称和路径是否已存在补丁文件中，如 `_SB.PCI0.LPCB.LID0`。如果不存在自行添加。
+-***SSDT-EXT3-WakeScreen*** —— `EXT3` extension patch. Solve the problem that some machines need to press any key to turn on the screen after waking up. When using it, check whether the device name and path of `PNP0C0D` are already in the patch file, such as `_SB.PCI0.LPCB.LID0`. If it does not exist, add it yourself.
 
-- ***SSDT-EXT5-TP-LED*** —— `EXT5` 扩展补丁。 解决 ThinkPad 机器唤醒后 A 面呼吸灯和电源键呼吸灯未恢复正常的问题；修复在 ThinkPad 老机型上唤醒后 <kbd>F4</kbd> 麦克风指示灯状态不正常的问题。
+-***SSDT-EXT5-TP-LED*** —— `EXT5` extension patch. Solved the problem that the breathing light on side A and the breathing light of the power button did not return to normal after the ThinkPad machine was awakened; fixed the problem that the status of the <kbd>F4</kbd> microphone indicator was abnormal after waking up on the old ThinkPad model.
 
-## 注意
+## Note
 
-具有相同扩展名称的补丁不可同时使用。如有同时使用的要求必须合并后使用。
+Patches with the same extension name cannot be used at the same time. If there are requirements for simultaneous use, they must be combined.
