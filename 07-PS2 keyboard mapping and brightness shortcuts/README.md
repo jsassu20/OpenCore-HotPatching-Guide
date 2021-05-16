@@ -1,67 +1,67 @@
-# PS2键盘映射及亮度快捷键
+# PS2 keyboard mapping and brightness shortcuts
 
-## 描述
+## Description
 
-- 通过键盘映射可以实现某个按键被按下后产生另一个按键的效果。比如，可以指定按下 `A/a` 后，打印输出的是 `Z/z`。再比如，指定 `F2` 实现原来 `F10` 的功能。
-- 新版【9月30日】 **VoodooPS2Controller.kext** 将亮度快捷键部分分离出独立驱动 **BrightnessKeys.kext** 并由它提供方法 `Notify (^^^GFX0.***, 0x86)` 和 `Notify (^^^GFX0.***, 0x87)` ，传统的亮度快捷键补丁不再需要。如果新的驱动无效请参考本章内容指定 2 个按键映射到 `F14`, `F15`，以实现快捷键调节亮度功能。
-  - **VoodooPS2Controller.kext** ：https://github.com/acidanthera/VoodooPS2
-  - **BrightnessKeys.kext** ：https://github.com/acidanthera/BrightnessKeys
+-Through the keyboard mapping, the effect of another key can be produced after a key is pressed. For example, you can specify that after pressing `A/a`, the print output is `Z/z`. For another example, specify `F2` to realize the original function of `F10`.
+-New version [September 30] **VoodooPS2Controller.kext** separates the brightness shortcut key part into an independent driver **BrightnessKeys.kext** and provides the method `Notify (^^^GFX0.***, 0x86) `And `Notify (^^^GFX0.***, 0x87)`, the traditional brightness shortcut patch is no longer needed. If the new driver is invalid, please refer to the content in this chapter to assign 2 keys to `F14`, `F15` to realize the shortcut key to adjust the brightness function.
+  -**VoodooPS2Controller.kext**: https://github.com/acidanthera/VoodooPS2
+  -**BrightnessKeys.kext**: https://github.com/acidanthera/BrightnessKeys
   
-  **注意**：一些 dell 机器和 asus 机器需要 `SSDT-OCWork-***` 或者 `操作系统补丁` 才能解除对 `Notify (^^^GFX0.***, 0x86)` 和 `Notify (^^^GFX0.***,0x87)` 的限制，让 **BrightnessKeys.kext** 正常工作。详细内容请参考《Dell机器特殊补丁》、《Asus机器特殊补丁》。
-- 不是所有按键都可以实现映射，只有 MAC 系统下能够捕捉到 `PS2 扫描码` 的按键才可以映射。
+  **Note**: Some dell machines and asus machines need `SSDT-OCWork-***` or `operating system patch` to uncheck `Notify (^^^GFX0.***, 0x86)` and `Notify ( ^^^GFX0.***,0x87)` restrictions, make **BrightnessKeys.kext** work normally. For details, please refer to "Special Patches for Dell Machines" and "Special Patches for Asus Machines".
+-Not all keys can be mapped, only the keys that can capture the PS2 scan code under the MAC system can be mapped.
 
-## 要求
+## Claim
 
-- 使用 **VoodooPS2Controller.kext** 以及它的子驱动。
-- 清除之前的、其他方法的按键映射内容。
+-Use **VoodooPS2Controller.kext** and its sub-drivers.
+-Clear the previous key mapping content of other methods.
 
-### PS2 扫描码 和 ABD 扫描码
+### PS2 scan code and ABD scan code
 
-一个按键会产生 2 种扫描码，分别是 **PS2 扫描码** 和 **ABD 扫描码**。比如 `Z/z` 键的 PS2 扫描码是 `2c`, ABD 扫描码是 `6`。因为扫描码的不同，对应了两种映射方法，分别是：
+One button will generate 2 scan codes, which are **PS2 scan code** and **ABD scan code**. For example, the PS2 scan code of the `Z/z` key is `2c`, and the ABD scan code is `6`. Because of the different scan codes, there are two mapping methods corresponding to:
 
-- `PS2 扫描码 —> PS2 扫描码`
-- `PS2 扫描码 —> ADB 扫描码`
+-`PS2 scan code —> PS2 scan code`
+-`PS2 scan code —> ADB scan code`
 
-### 获取键盘扫描码
+### Get keyboard scan code
 
-- 查阅头文件 `ApplePS2ToADBMap.h`，文件中列举了大多数按键的扫描码。
+-Refer to the header file `ApplePS2ToADBMap.h`, the scan codes of most buttons are listed in the file.
 
-- 控制台获取键盘扫描码（二选一）
+-Get the keyboard scan code from the console (choose one)
 
-  - 终端安装 `ioio`
+  -Terminal install `ioio`
 
     ```bash
       ioio -s ApplePS2Keyboard LogScanCodes 1
     ```
 
-  - **修改** `VoodooPS2Keyboard.kext\info\IOKitPersonalities\Platform Profile\Default\`**`LogScanCodes`** `=` **`1`**
+  -**Modify** `VoodooPS2Keyboard.kext\info\IOKitPersonalities\Platform Profile\Default\`**`LogScanCodes`** `=` **`1`**
 
-  打开控制台，搜索 `ApplePS2Keyboard`。按下按键，如 `A/a`，`Z/z`。
+  Open the console and search for `ApplePS2Keyboard`. Press the keys, such as `A/a`, `Z/z`.
 
   ```log
-    11:58:51.255023 +0800 kernel  ApplePS2Keyboard: sending key 1e=0 down
-    11:58:58.636955 +0800 kernel  ApplePS2Keyboard: sending key 2c=6 down
+    11:58:51.255023 +0800 kernel ApplePS2Keyboard: sending key 1e=0 down
+    11:58:58.636955 +0800 kernel ApplePS2Keyboard: sending key 2c=6 down
   ```
 
-  其中：
+  among them:
 
-  第一行的 `1e=0` 中的 `1e` 是 `A/a` 键的 PS2 扫描码，`0` 是 ADB 扫描码。
+  The `1e` in the first line of `1e=0` is the PS2 scan code of the `A/a` key, and `0` is the ADB scan code.
 
-  第二行的 `2c=6` 中的 `2c` 是 `Z/z` 键的 PS2 扫描码，`6` 是 ADB 扫描码。
+  The `2c` in the second line of `2c=6` is the PS2 scan code of the `Z/z` key, and `6` is the ADB scan code.
 
-### 映射方法
+### Mapping method
 
-通过修改 `VoodooPS2Keyboard.kext\info.plist` 文件和添加第三方补丁文件的方法可以实现键盘映射。推荐使用第三方补丁文件的方法。
+Keyboard mapping can be achieved by modifying the `VoodooPS2Keyboard.kext\info.plist` file and adding a third-party patch file. The method of using a third-party patch file is recommended.
 
-示例：***SSDT-RMCF-PS2Map-AtoZ***。`A/a` 映射 `Z/z`。
+Example: ***SSDT-RMCF-PS2Map-AtoZ***. `A/a` maps `Z/z`.
 
-- `A/a` PS2 扫描码:`1e`
-- `Z/z` PS2 扫描码:`2c`
-- `Z/z` ADB 扫描码:`06`
+-`A/a` PS2 Scan code: `1e`
+-`Z/z` PS2 scan code: `2c`
+-`Z/z` ADB scan code: `06`
 
-以下两种映射方法任选其一
+Choose one of the following two mapping methods
 
-#### PS2 扫描码 —> PS2 扫描码
+#### PS2 scan code —> PS2 scan code
 
 ```Swift
     ...
@@ -73,7 +73,7 @@
     ...
 ```
 
-#### PS2 扫描码 —> ADB 扫描码
+#### PS2 scan code —> ADB scan code
 
 ```Swift
     ...
@@ -85,13 +85,13 @@
     ...
 ```
 
-### 注意事项
+### Precautions
 
-- 示例中的键盘路径是 `\_SB.PCI0.LPCB.PS2K`，使用时应保证其路径和 ACPI 的键盘路径一致。大多数 Thinkpad 机器的键盘路径是 `\_SB.PCI0.LPC.KBD` 或者 `\_SB.PCI0.LPCB.KBD`。
+-The keyboard path in the example is `\_SB.PCI0.LPCB.PS2K`, please ensure that its path is consistent with the ACPI keyboard path when using it. The keyboard path of most Thinkpad machines is `\_SB.PCI0.LPC.KBD` or `\_SB.PCI0.LPCB.KBD`.
 
-- 补丁里使用了变量 `RMCF` ，如果其他**键盘补丁**里也使用了 `RMCF`，必须合并后使用。参见 ***SSDT-RMCF-PS2Map-dell***。`注`：***SSDT-RMCF-MouseAsTrackpad*** 用于强制开启触摸板设置选项。
+-The variable `RMCF` is used in the patch. If `RMCF` is also used in other **keyboard patches**, it must be merged and used. See ***SSDT-RMCF-PS2Map-dell***. `Note`: ***SSDT-RMCF-MouseAsTrackpad*** is used to forcibly turn on the touchpad setting option.
 
-- 在 VoodooPS2 中，<kbd>PrtSc</kbd> 按键对应的 PS2 扫描码是 `e037`，即触摸板（以及 ThinkPad 机器的小红点）的开关。可以将该按键映射到 `F13`、并在「系统偏好设置」中将 `F13` 绑定到截图功能上：
+-In VoodooPS2, the PS2 scan code corresponding to the <kbd>PrtSc</kbd> button is `e037`, which is the switch of the touchpad (and the small red dot on ThinkPad machines). You can map this button to `F13`, and bind `F13` to the screenshot function in the "System Preferences":
 
 ```Swift
     ...
