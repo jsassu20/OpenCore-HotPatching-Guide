@@ -1,19 +1,19 @@
-# OCI2C-TPXX补丁方法
+# OCI2C-TPXX patch method
 
-## 说明
+## Description
 
-本方法提供一种对 I2C 设备实施 Hotpatch 补丁的解决方案。本方法不涉及 I2C 补丁具体过程和细节。有关更多的 I2C 方面内容详见：
+This method provides a solution for implementing Hotpatch patches on I2C devices. This method does not involve the specific process and details of the I2C patch. For more information about I2C, see:
 
-- @penghubingzhou：[https://www.penghubingzhou.cn](https://www.penghubingzhou.cn)
-- @神楽小白(GZ小白):[https://blog.gzxiaobai.cn/](https://blog.gzxiaobai.cn/)
-- @神楽小白(GZ小白)的触摸板热补丁范例库:[https://github.com/GZXiaoBai/Hackintosh-TouchPad-Hotpatch](https://github.com/GZXiaoBai/Hackintosh-TouchPad-Hotpatch)
-- VoodooI2C 官方文档：[https://voodooi2c.github.io/#GPIO%20Pinning/GPIO%20Pinning](https://voodooi2c.github.io/#GPIO%20Pinning/GPIO%20Pinning)
-- VoodooI2C 官方支持帖 [https://www.tonymacx86.com/threads/voodooi2c-help-and-support.243378/](https://www.tonymacx86.com/threads/voodooi2c-help-and-support.243378/)
-- Q群：`837538729` (1 群已满)，`921143329` (2 群)
+-@penghubingzhou: [https://www.penghubingzhou.cn](https://www.penghubingzhou.cn)
+-@神楽小白(GZ小白):[https://blog.gzxiaobai.cn/](https://blog.gzxiaobai.cn/)
+-@神楽小白(GZ小白) Touchpad hot patch example library: [https://github.com/GZXiaoBai/Hackintosh-TouchPad-Hotpatch](https://github.com/GZXiaoBai/Hackintosh-TouchPad- Hotpatch)
+-VoodooI2C official document: [https://voodooi2c.github.io/#GPIO%20Pinning/GPIO%20Pinning](https://voodooi2c.github.io/#GPIO%20Pinning/GPIO%20Pinning)
+-VoodooI2C official support post [https://www.tonymacx86.com/threads/voodooi2c-help-and-support.243378/](https://www.tonymacx86.com/threads/voodooi2c-help-and-support. 243378/)
+-Q group: `837538729` (1 group is full), `921143329` (2 groups)
 
-## 补丁原理和过程
+## Patch principle and process
 
-- 禁止原 I2C 设备。详见《二进制更名与预置变量》。
+-Prohibit the original I2C device. See "Binary Rename and Preset Variables" for details.
 
   ```Swift
   /*
@@ -34,13 +34,13 @@
   }
   ```
 
-- 新建一个 I2C 设备 `TPXX`，将原设备所有内容移植到 `TPXX` 中。
+-Create a new I2C device `TPXX`, and migrate all the contents of the original device to `TPXX`.
 
-- 修正 `TPXX` 有关内容：
+-Amend the related content of `TPXX`:
 
-  - 原 I2C 设备`名称`全部替换为 `TPXX`
+  -Replace all the original I2C device `name` with `TPXX`
 
-  - **修正** `_STA` 部分为：
+  -**Amendment** The `_STA` part is:
 
     ```Swift
     Method (_STA, 0, NotSerialized)
@@ -56,17 +56,17 @@
     }
     ```
 
-  - **修正**禁止原 I2C 设备时用到的变量的`有关内容`，使其符合逻辑关系。
+  -**Fixed** to prohibit the `related content` of the variables used in the original I2C device, so that it conforms to the logical relationship.
 
-  - **修正**涉及到操作系统变量 OSYS 的`有关内容`，使其符合逻辑关系。
+  -**Fix** the `relevant content` related to the operating system variable OSYS, so that it conforms to the logical relationship.
 
-- 排除错误。
+-Eliminate errors.
 
-- I2C 补丁。
+-I2C patch.
 
-### 示例 (Dell Latitude 5480，设备路径：`\_SB.PCI0.I2C1.TPD1`)
+### Example (Dell Latitude 5480, device path: `\_SB.PCI0.I2C1.TPD1`)
 
-- 使用《预置变量法》禁止 `TPD1`。
+-Use "Preset Variables Law" to prohibit `TPD1`.
 
   ```Swift
   Scope (\)
@@ -78,7 +78,7 @@
   }
   ```
 
-- 新建设备 `TPXX`，将原 `TPD1` 所有内容移植到 `TPXX` 中。
+-Create a new device `TPXX`, and migrate all the contents of the original `TPD1` to `TPXX`.
 
   ```Swift
   External(_SB.PCI0.I2C1, DeviceObj)
@@ -86,16 +86,16 @@
   {
       Device (TPXX)
       {
-         原TPD1内容
+         Original TPD1 content
       }
   }
   ```
 
-- 修正 `TPXX` 内容
+-Modify the content of `TPXX`
 
-  - 所有 `TPD1` 替换为 `TPXX`。
+  -Replace all `TPD1` with `TPXX`.
   
-  - 补丁中 `_STA` 部分替换为：
+  -The `_STA` part of the patch is replaced with:
   
     ```Swift
     Method (_STA, 0, NotSerialized)
@@ -111,19 +111,19 @@
     }
     ```
   
-  - 查找 `SDS1` (禁止 `TPD1` 时用到的变量)，将原 `If (SDS1...)` 修改为 `If (one)`。
+  -Find `SDS1` (variable used when `TPD1` is prohibited), and change the original `If (SDS1...)` to `If (one)`.
   
-  - 查找 `OSYS`，删除（注释掉）以下内容：
+  -Find `OSYS` and delete (comment out) the following:
   
     ```Swift
     //If (LLess (OSYS, 0x07DC))
     //{
-    //    SRXO (GPDI, One)
+    // SRXO (GPDI, One)
     //}
     ```
   
-    注：`OSYS` 小于 `0x07DC` 时，I2C 设备不工作（`0x07DC`代表 Windows8）。
+    Note: When `OSYS` is less than `0x07DC`, the I2C device does not work (`0x07DC` stands for Windows8).
   
-- 添加外部引用 `External...` 修补所有错误。
+-Add external reference `External...` to fix all errors.
 
-- I2C 补丁（略）
+-I2C patch (omitted)
