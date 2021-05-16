@@ -21,4 +21,4 @@ Some machines don't have Ethernet, imitating Ethernet to realize normal APP down
 -After entering the system again, open **Network** of **System Preferences** again.
 -Add **Ethernet** and other required networks in sequence, and click **Apply**.
 
-![image]https://github.com/jsassu20/OpenCore-HotPatching-Guide/blob/master/13-Fake%20Ethernet%20and%20reset%20Ethernet%20BSD%20Name/Clear%20all%20network.jpeg
+![image]13-Fake Ethernet and reset Ethernet BSD Name/Clear all network.png
