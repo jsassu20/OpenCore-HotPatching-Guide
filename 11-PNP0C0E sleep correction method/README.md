@@ -1,166 +1,166 @@
-# PNP0C0E 睡眠修正方法
+# PNP0C0E Sleep correction method
 
-## `PNP0C0E` 和 `PNP0C0D` 睡眠方式
+## `PNP0C0E` and `PNP0C0D` sleep mode
 
-- ACPI 规范
+-ACPI specification
 
   `PNP0C0E` — Sleep Button Device
 
   `PNP0C0D` — Lid Device
 
-  有关 `PNP0C0E` 和 `PNP0C0D` 详细内容请查阅 ACPI 规范。
+  For details of `PNP0C0E` and `PNP0C0D`, please refer to the ACPI specification.
 
-- `PNP0C0E` 睡眠条件
+-`PNP0C0E` sleep conditions
 
-  - 执行 `Notify(***.SLPB, 0x80)`。 `SLPB` 是 `PNP0C0E` 设备名称。
+  -Execute `Notify(***.SLPB, 0x80)`. `SLPB` is the name of the `PNP0C0E` device.
   
-- `PNP0C0D` 睡眠条件
+-`PNP0C0D` sleep conditions
 
-  - `_LID`  返回 `Zero` 。 `_LID` 是 `PNP0C0D` 设备当前状态。
-  - 执行 `Notify(***.LID0, 0x80)`。 `LID0` 是 `PNP0C0D` 设备名称。
+  -`_LID` returns `Zero`. `_LID` is the current status of the `PNP0C0D` device.
+  -Execute `Notify(***.LID0, 0x80)`. `LID0` is the name of the `PNP0C0D` device.
 
-## 问题描述
+## Problem Description
 
-部分机器提供了睡眠按键（小月亮按键），如：部分 ThinkPad 的 Fn+F4，Dell 的 Fn+Insert 等。当按下这个按键后，系统执行了 `PNP0C0E` 睡眠。可是，ACPI 错误地向系统传递了关机参数而非睡眠参数，从而导致系统崩溃。即使能够睡眠也能正常唤醒，系统工作状态也被破坏。
+Some machines provide a sleep button (little moon button), such as Fn+F4 for some ThinkPad, Fn+Insert for Dell and so on. When this button is pressed, the system executes the `PNP0C0E` sleep. However, ACPI incorrectly passed the shutdown parameter instead of the sleep parameter to the system, which caused the system to crash. Even if you can sleep, you can wake up normally, and the system's working status is destroyed.
 
-下列方法之一可以修复这个问题：
+One of the following methods can fix this problem:
 
-- 截取ACPI 传递的参数并纠正它。
-- 将`PNP0C0E` 睡眠转换为`PNP0C0D` 睡眠。
+-Intercept the parameters passed by ACPI and correct it.
+-Convert `PNP0C0E` sleep to `PNP0C0D` sleep.
 
-## 解决方案
+## solution
 
-### 关联的3个补丁
+### Associated 3 patches
 
-- ***SSDT-PTSWAK*** ：定义变量 `FNOK` 和 `MODE` ，捕捉 `FNOK` 的变化。见《PTSWAK综合扩展补丁》。
+-***SSDT-PTSWAK***: Define the variables `FNOK` and `MODE` to capture the changes of `FNOK`. See "PTSWAK Comprehensive Extension Patch".
 
-  - `FNOK` 表示按键状态
-    - `FNOK` =1：按下睡眠按键
-    - `FNOK` =0：再次按下睡眠按键或者机器被唤醒后
-  - `MODE` 设定睡眠模式
-    - `MODE` =1：`PNP0C0E` 睡眠
-    - `MODE` =0：`PNP0C0D` 睡眠
+  -`FNOK` indicates the state of the button
+    -`FNOK` =1: Press the sleep button
+    -`FNOK` =0: Press the sleep button again or the machine is woken up
+  -`MODE` set sleep mode
+    -`MODE` =1: `PNP0C0E` sleep
+    -`MODE` =0: `PNP0C0D` sleep
 
-  注意：根据自己的需要设置 `MODE` ，但不可以更改 `FNOK` 。
+  Note: Set `MODE` according to your needs, but you cannot change `FNOK`.
 
-- ***SSDT-LIDpatch*** ：捕捉 `FNOK` 变化
+-***SSDT-LIDpatch***: Capture `FNOK` changes
 
-  - 如果 `FNOK` =1，盖子设备当前状态返回 `Zero`
-  - 如果 `FNOK` =0，盖子设备当前状态返回原始值
+  -If `FNOK` =1, the current status of the lid device returns to `Zero`
+  -If `FNOK` =0, the current state of the cover device returns to the original value
 
-  注意： `PNP0C0D` 设备名称、路径要和ACPI一致。
+  Note: `PNP0C0D` device name and path must be consistent with ACPI.
 
-- ***睡眠按键补丁*** ：按键按下后，令 `FNOK` = `1` ，并根据不同的睡眠模式执行相应的操作
+-***Sleep button patch***: After the button is pressed, set `FNOK` = `1`, and perform corresponding operations according to different sleep modes
 
-  注意：`PNP0C0D` 设备名称、路径要和ACPI一致。
+  Note: `PNP0C0D` device name and path must be consistent with ACPI.
 
-#### 两种睡眠方式描述
+#### Description of two sleep modes
 
-- `MODE` =1模式：当按下睡眠按键时， ***睡眠按键补丁*** 令 `FNOK=1`。 ***SSDT-PTSWAK*** 捕捉到 `FNOK` 为 `1`，强制令`Arg0=3`（否则`Arg0=5`）。待唤醒后恢复 `FNOK=0`。一次完整的 `PNP0C0E` 睡眠和唤醒过程结束。
-- `MODE` =0模式：当按下睡眠按键时，除了完成上述过程外， ***SSDT-LIDpatch*** 同时扑捉到 `FNOK=1` ，使 `_LID`  返回 `Zero` 并执行 `PNP0C0D` 睡眠。待唤醒后恢复 `FNOK=0`。一次完整的 `PNP0C0D` 睡眠和唤醒过程结束。
+-`MODE` =1 mode: When the sleep button is pressed, ***sleep button patch*** makes `FNOK=1`. ***SSDT-PTSWAK*** caught `FNOK` as `1`, and enforced `Arg0=3` (otherwise `Arg0=5`). Restore `FNOK=0` after waking up. A complete `PNP0C0E` sleep and wake-up process is over.
+-`MODE` =0 mode: When the sleep button is pressed, in addition to completing the above process, ***SSDT-LIDpatch*** also captures `FNOK=1` and makes `_LID` return to `Zero` and execute `PNP0C0D` sleep. Restore `FNOK=0` after waking up. A complete `PNP0C0D` sleep and wake-up process is over.
 
-以下是 ***SSDT-LIDpatch*** 主要内容：
+The following are the main contents of ***SSDT-LIDpatch***:
 
 ```Swift
 Method (_LID, 0, NotSerialized)
 {
     if(\_SB.PCI9.FNOK==1)
     {
-        Return (0) /* 返回 Zero, 满足 PNP0C0D 睡眠条件之一 */
+        Return (0) /* Return to Zero, which satisfies one of the PNP0C0D sleep conditions */
     }
     Else
     {
-        Return (\_SB.LID0.XLID()) /* 返回原始值 */
+        Return (\_SB.LID0.XLID()) /* Return to the original value */
     }
 }
 ```
 
-以下是 ***睡眠按键补丁*** 主要内容：
+The following is the main content of ***sleep button patch***:
 
 ```Swift
-If (\_SB.PCI9.MODE == 1) /* PNP0C0E 睡眠 */
+If (\_SB.PCI9.MODE == 1) /* PNP0C0E sleep */
 {
-    \_SB.PCI9.FNOK =1 /* 按下睡眠按键 */
-    \_SB.PCI0.LPCB.EC.XQ13() /* 原始睡眠按键位置，示例是 TP 机器 */
+    \_SB.PCI9.FNOK =1 /* Press the sleep button */
+    \_SB.PCI0.LPCB.EC.XQ13() /* Original sleep button position, the example is TP machine */
 }
-Else /* PNP0C0D 睡眠 */
+Else /* PNP0C0D sleep */
 {
     If (\_SB.PCI9.FNOK!=1)
     {
-            \_SB.PCI9.FNOK =1 /* 按下睡眠按键 */
+            \_SB.PCI9.FNOK =1 /* Press the sleep button */
     }
     Else
     {
-            \_SB.PCI9.FNOK =0 /* 再次按下睡眠按键 */
+            \_SB.PCI9.FNOK =0 /* press the sleep button again */
     }
-    Notify (\_SB.LID, 0x80) /* 执行 PNP0C0D 睡眠 */
+    Notify (\_SB.LID, 0x80) /* Execute PNP0C0D sleep */
 }
 ```
 
-### 更名和补丁组合示例:（Dell Latitude 5480 和 ThinkPad X1C5th）
+### Example of rename and patch combination: (Dell Latitude 5480 and ThinkPad X1C5th)
 
-- **Dell Latitude 5480**
+-**Dell Latitude 5480**
 
-  PTSWAK更名：`_PTS` to `ZPTS`、`_WAK` to `ZWAK`。
+  PTSWAK was renamed: `_PTS` to `ZPTS`, `_WAK` to `ZWAK`.
 
-  盖子状态更名：`_LID` to `XLID`
+  Lid status renamed: `_LID` to `XLID`
 
-  按键更名：`BTNV` to `XTNV` (Dell-Fn+Insert)
+  Renamed button: `BTNV` to `XTNV` (Dell-Fn+Insert)
 
-  补丁组合：
+  Patch combination:
 
-  - ***SSDT-PTSWAK***：综合补丁。根据自己的需要设置 `MODE`。
-  - ***SSDT-LIDpatch***：盖子状态补丁。
-  - ***SSDT-FnInsert_BTNV-dell***：睡眠按键补丁。
+  -***SSDT-PTSWAK***: Comprehensive patch. Set `MODE` according to your needs.
+  -***SSDT-LIDpatch***: Lid status patch.
+  -***SSDT-FnInsert_BTNV-dell***: Sleep button patch.
 
-- **ThinkPad X1C5th**
+-**ThinkPad X1C5th**
 
-  PTSWAK更名：`_PTS` to `ZPTS`、`_WAK` to `ZWAK`。
+  PTSWAK was renamed: `_PTS` to `ZPTS`, `_WAK` to `ZWAK`.
 
-  盖子状态更名： `_LID` to `XLID`
+  Lid status renamed: `_LID` to `XLID`
 
-  按键更名：`_Q13 to XQ13` (TP-Fn+F4)
+  Key rename: `_Q13 to XQ13` (TP-Fn+F4)
   
-  补丁组合：
+  Patch combination:
   
-  - ***SSDT-PTSWAK***：综合补丁。根据自己的需要设置 `MODE`。
-  - ***SSDT-LIDpatch***：盖子状态补丁。修改补丁内 `LID0` 为 `LID`。
-  - ***SSDT-FnF4_Q13-X1C5th***：睡眠按键补丁。
+  -***SSDT-PTSWAK***: Comprehensive patch. Set `MODE` according to your needs.
+  -***SSDT-LIDpatch***: Lid status patch. Modify `LID0` to `LID` in the patch.
+  -***SSDT-FnF4_Q13-X1C5th***: Sleep button patch.
   
-  **注意1**：X1C5th 的睡眠按键是 Fn+4，有的TP的睡眠按键是 Fn+F4。
+  **Note 1**: The sleep button of X1C5th is Fn+4, and the sleep button of some TPs is Fn+F4.
   
-  **注意2**：TP 机器 `LPC` 控制器名称可能是`LPC`、也可能是`LPCB`。
+  **Note 2**: TP machine `LPC` controller name may be `LPC` or `LPCB`.
 
-### 其他机器修复 `PNP0C0E` 睡眠
+### Other machines repair `PNP0C0E` sleep
 
-- 使用补丁： ***SSDT-PTSWAK*** ；更名：`_PTS` to `ZPTS`、`_WAK` to `ZWAK`。见《PTSWAK综合扩展补丁》。
+-Use patch: ***SSDT-PTSWAK***; renamed: `_PTS` to `ZPTS`, `_WAK` to `ZWAK`. See "PTSWAK Comprehensive Extension Patch".
 
-  根据自己的需要修改 `MODE`。
+  Modify `MODE` according to your needs.
 
-- 使用补丁： ***SSDT-LIDpatch*** ；更名： `_LID` to `XLID` 。
+-Use patch: ***SSDT-LIDpatch***; renamed: `_LID` to `XLID`.
 
-  注意： `PNP0C0D` 设备名称、路径要和ACPI一致。
+  Note: `PNP0C0D` device name and path must be consistent with ACPI.
 
-- 查找睡眠按键位置、制作 ***睡眠按键补丁***
+-Find the position of the sleep button, make ***sleep button patch***
 
-  - 一般情况下，睡眠按键是 `EC` 下的 `_Qxx`，这个 `_Qxx` 里包涵 `Notify(***.SLPB,0x80)` 指令。如果查找不到，DSDT 全文搜索 `Notify(***.SLPB,0x80)` ，找到其所在位置，逐步向上查找最初位置。
-  - 参考示例制作睡眠按键补丁以及必要的更名。
+  -Normally, the sleep button is `_Qxx` under `EC`, this `_Qxx` contains `Notify(***.SLPB,0x80)` command. If it can't be found, DSDT will search the full text `Notify(***.SLPB,0x80)` to find its location, and then look up the original location step by step.
+  -Make sleep button patch and rename if necessary with reference to the example.
 
-  注意1：SLPB是 `PNP0C0E` 设备名称。如果确认没有 `PNP0C0E` 设备，添加补丁：SSDT-SLPB（位于《添加缺失的部件》）。
+  Note 1: SLPB is the name of the `PNP0C0E` device. If you confirm that there is no `PNP0C0E` device, add a patch: SSDT-SLPB (located in "Add Missing Parts").
 
-  注意2： `PNP0C0D` 设备名称、路径要和ACPI一致。
+  Note 2: `PNP0C0D` device name and path should be consistent with ACPI.
 
-### `PNP0C0E` 睡眠特点
+### `PNP0C0E` Sleep features
 
-- 睡眠过程稍快。
-- 睡眠过程无法被终止。
+-The sleep process is slightly faster.
+-The sleep process cannot be terminated.
 
-### `PNP0C0D` 睡眠特点
+### `PNP0C0D` Sleep features
 
-- 睡眠过程中，再次按下睡眠按键立即终止睡眠。
+-During sleep, press the sleep button again to terminate sleep immediately.
 
-- 接入外显时，按下睡眠按键后，工作屏幕为外显（内屏灭）；再次按下睡眠按键，内屏、外显正常。
+-When the external display is connected, after pressing the sleep button, the working screen becomes the external display (the internal screen is off); pressing the sleep button again, the internal and external displays are normal.
 
-## 注意事项
+## Precautions
 
-- `PNP0C0E` 和 `PNP0C0D` 设备名称、路径要和ACPI一致。
+-`PNP0C0E` and `PNP0C0D` device names and paths must be consistent with ACPI.
