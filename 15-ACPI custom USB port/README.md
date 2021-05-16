@@ -1,17 +1,17 @@
-# ACPI定制USB端口
+# ACPI custom USB port
 
-## 描述
+## Description
 
-- 本方法通过修改 ACPI 文件实现USB端口的定制。
-- 本方法操作过程需要 drop 某个 ACPI 文件。通常情况下，OpenCore **不建议** 这样做，定制 USB 端口一般使用 ***Hackintool.app*** 工具。
-- 本方法献给爱好者们。
+-This method realizes the customization of the USB port by modifying the ACPI file.
+-This method needs to drop a certain ACPI file. Under normal circumstances, OpenCore **not recommended** to do so, custom USB ports generally use the ***Hackintool.app*** tool.
+-This method is dedicated to fans.
 
-## 适用范围
+## Scope of application
 
-- XHC 以及它的 `_UPC` 存在于单独的 ACPI 文件中
-- 此方法不适用于 `_UPC` 存在于 DSDT 中的设备 (e.g. 华硕)
+-XHC and its `_UPC` exist in a separate ACPI file
+-This method is not applicable to devices where `_UPC` exists in DSDT (e.g. ASUS)
 
-## `_UPC` 规范
+## `_UPC` Specification
 
 ```Swift
 _UPC, Package ()
@@ -23,64 +23,64 @@ _UPC, Package ()
 }
 ```
 
-### 解释
+### Explanation
 
 1. **`xxxx`**
-   - `0x00` 代表这个端口不存在
-   - 其他值 (通常为 `0x0F`) 代表这个端口存在
+   -`0x00` means this port does not exist
+   -Other values ​​(usually `0x0F`) represent the existence of this port
 
 2. **`yyyy`**
 
-   **`yyyy`** 处定义的是端口的类型, 参考下表
+   **`yyyy`** defines the port type, refer to the following table
 
-   | **`yyyy`** | 端口类型                      |
+   | **`yyyy`** | Port Type |
    | :------: | ----------------------------- |
-   |  `0x00`  | USB Type `A`                  |
-   |  `0x01`  | USB `Mini-AB`                 |
-   |  `0x02`  | USB 智能卡                    |
-   |  `0x03`  | USB 3 标准 Type `A`           |
-   |  `0x04`  | USB 3 标准 Type `B`           |
-   |  `0x05`  | USB 3 `Micro-B`               |
-   |  `0x06`  | USB 3 `Micro-AB`              |
-   |  `0x07`  | USB 3 `Power-B`               |
-   |  `0x08`  | USB Type `C` **(只有 USB 2)** |
-   |  `0x09`  | USB Type `C` **(带有转向器)** |
-   |  `0x0A`  | USB Type `C` **(不带转向器)** |
-   |  `0xFF`  | 内置 |
+   | `0x00` | USB Type `A` |
+   | `0x01` | USB `Mini-AB` |
+   | `0x02` | USB Smart Card |
+   | `0x03` | USB 3 Standard Type `A` |
+   | `0x04` | USB 3 Standard Type `B` |
+   | `0x05` | USB 3 `Micro-B` |
+   | `0x06` | USB 3 `Micro-AB` |
+   | `0x07` | USB 3 `Power-B` |
+   | `0x08` | USB Type `C` **(Only USB 2)** |
+   | `0x09` | USB Type `C` **(with diverter)** |
+   | `0x0A` | USB Type `C` **(without diverter)** |
+   | `0xFF` | Built-in |
 
-   > 如果 USB-C 正反两面插入在 Hackintool 都显示为同一个端口就说明这个端口有转向器
+   > If the front and back of the USB-C are plugged into the same port in Hackintool, it means that the port has a redirector
    >
-   > 反之，如果正反两面占用了两个端口就说明没有转向器
+   > Conversely, if two ports are occupied on both sides, it means that there is no diverter
 
-## USB定制过程
+## USB customization process
 
-- 清除其他定制方法的补丁、驱动等。
+-Clear patches, drivers, etc. of other customization methods.
 
-- drop ACPI文件
+-drop ACPI file
 
-  - 确认 XHC 并包括 `_UPC` 的 ACPI 文件
-    > 如 dell5480 的 ***SSDT-2-xh_OEMBD.aml***
+  -Confirm XHC and include the ACPI file of `_UPC`
+    > Such as ***SSDT-2-xh_OEMBD.aml*** of dell5480
     >
-    > 如 小新 PRO13（i5）的 ***SSDT-8-CB-01.aml*** （无独显机器是 ***SSDT-6-CB-01.aml*** ）
+    > Such as ***SSDT-8-CB-01.aml*** of Xiaoxin PRO13 (i5) (the machine without independent display is ***SSDT-6-CB-01.aml***)
 
-  - `config\ACPI\Delete\` 以 `TableLength` （十进制）和 `TableSignature` 方式 drop ACPI 文件。如：
+  -`config\ACPI\Delete\` drop ACPI files in `TableLength` (decimal) and `TableSignature` methods. Such as:
 
-    **dell5480**： **`TableLength`** = `2001`， **`TableSignature`** = `53534454`（SSDT）
+    **dell5480**: **`TableLength`** = `2001`, **`TableSignature`** = `53534454` (SSDT)
 
-    **小新PRO13（i5）**： **`TableLength`** = `12565`， **`TableSignature`** = `53534454`（SSDT）
+    **Xiaoxin PRO13 (i5)**: **`TableLength`** = `12565`, **`TableSignature`** = `53534454` (SSDT)
     
-    **TableLength**可以从该aml文件的表头处`Length`中得到。
+    **TableLength** can be obtained from the `Length` at the header of the aml file.
 
-- 定制 SSDT 补丁文件
+-Customize SSDT patch file
 
-  - 将需要 drop 的原始 ACPI 文件拖到桌面，**建议：**
+  -Drag the original ACPI file that needs to be dropped to the desktop, **recommendation:**
 
-    - 另存为 `.asl / .dsl` 格式
-    - 修改文件名。如： ***SSDT-xh_OEMBD_XHC.dsl***, ***SSDT-CB-01_XHC.dsl***
-    - 修改文件内的 `OEM Table ID` 为自己喜欢的名字。
-    - 排除错误。
+    -Save as `.asl / .dsl` format
+    -Modify the file name. Such as: ***SSDT-xh_OEMBD_XHC.dsl***, ***SSDT-CB-01_XHC.dsl***
+    -Modify the `OEM Table ID` in the file to your favorite name.
+    -Eliminate errors.
 
-  - SSDT 文件中所有端口的 `_UPC` 最前端添加以下代码：
+  -Add the following code to the front end of `_UPC` of all ports in the SSDT file:
 
     ```Swift
     Method (_UPC, 0, NotSerialized)
@@ -95,25 +95,25 @@ _UPC, Package ()
                 0x00
             })
         }
-        /* 以下是原内容 */
+        /* The following is the original content */
         ...
     }
     ```
 
-  - 根据 `_UPC` 规范定制 USB 端口。即，修正 xxxx、yyyy 的值。
+  -Customize the USB port according to the `_UPC` specification. That is, the values ​​of xxxx and yyyy are corrected.
 
-    - 如果端口不存在
-      - **`xxxx`** = `0x00`
-      - **`yyyy`** = `0x00`
-    - 如果端口存在
-      - **`xxxx`** = `0xFF`
-      - **`yyyy`**
+    -If the port does not exist
+      -**`xxxx`** = `0x00`
+      -**`yyyy`** = `0x00`
+    -If the port exists
+      -**`xxxx`** = `0xFF`
+      -**`yyyy`**
 
-    > 参考上文的表格
+    > Refer to the table above
   
-  - 排错、编译、补丁文件放至 `ACPI` 、添加补丁列表。
+  -Debug, compile, and put patch files into `ACPI`, add patch list.
 
-### 参考示例
+### Reference example
 
-- ***SSDT-xh_OEMBD_XHC***
-- ***SSDT-CB-01_XHC***
+-***SSDT-xh_OEMBD_XHC***
+-***SSDT-CB-01_XHC***
