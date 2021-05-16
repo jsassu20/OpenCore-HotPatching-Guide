@@ -1,12 +1,12 @@
-# 仿冒RTC
+# Counterfeit RTC
 
-## 综述
+## Summary
 
-对于某些 300 系主板，`RTC` 设备默认被禁用的且无法通过和 `AWAC` 共用的 `STAS` 变量控制 `_STA` 的返回值来启用传统 RTC 设备，导致 ***`SSDT-AWAC`*** 无法生效，因此为了强制启用 `RTC` 设备，我们需要仿冒一个 `RTC0`。
+For some 300 series motherboards, the `RTC` device is disabled by default and the return value of `_STA` cannot be controlled by the `STAS` variable shared with `AWAC` to enable the traditional RTC device, resulting in ***`SSDT-AWAC` *** Cannot take effect, so in order to force enable `RTC` device, we need to fake a `RTC0`.
 
-## 使用方法
+## Instructions
 
-> 案例
+> Case
 
 ```Swift
 Device (RTC)
@@ -30,7 +30,7 @@ Device (RTC)
 }
 ```
 
-> 上面就是 `RTC` 设备被禁用的情况，仿冒方法如下：
+> The above is the case where the `RTC` device is disabled. The counterfeiting method is as follows:
 
 ```swift
 DefinitionBlock ("", "SSDT", 2, "ACDT", "RTC0", 0)
@@ -69,8 +69,8 @@ DefinitionBlock ("", "SSDT", 2, "ACDT", "RTC0", 0)
 }
 ```
 
-## 注意
+## Note
 
-- 此部件只对 300 系主板有效。
-- 此部件只在没有使用 ***`SSDT-AWAC`*** 且原始 `ACPI` 中 `RTC` 设备的 `_STA` 方法返回值是 `0` 时使用。
-- 示例补丁的设备路径是 `LPCB`，请结合实际情况修改。
+-This component is only valid for 300 series motherboards.
+-This component is only used when ***`SSDT-AWAC`*** is not used and the return value of the `_STA` method of the `RTC` device in the original `ACPI` is `0`.
+-The device path of the sample patch is `LPCB`, please modify it according to the actual situation.

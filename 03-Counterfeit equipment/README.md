@@ -1,31 +1,31 @@
-# 仿冒设备
+# Counterfeit equipment
 
-## 综述
+## Summary
 
-在众多 `SSDT` 补丁当中，相当数量的补丁可以归纳为仿冒设备补丁，如：
+Among the many `SSDT` patches, a considerable number of patches can be classified as counterfeit device patches, such as:
 
-- 某些设备在ACPI中不存在，可是MAC系统需要它们。通过补丁对这些设备正确描述能够加载设备驱动。如《05-2-PNLF注入方法》、《添加缺失的部件》、《仿冒以太网》等。
-- EC问题。如《仿冒EC》。
-- 对于某些特殊的设备，使用禁止原始设备再仿冒它的方法，会给我们调整补丁的工作带来方便。如《OCI2C-TPXX补丁方法》。
-- 某个原因造成某个设备被禁用，可是MAC系统需要它才能工作。见`本章`示例。
-- 多数情况下，使用《二进制更名与预置变量》也可以启用设备。
+-Some devices do not exist in ACPI, but the MAC system needs them. The correct description of these devices through the patch can load the device driver. Such as "05-2-PNLF Injection Method", "Add Missing Components", "Counterfeit Ethernet", etc.
+-EC issues. Such as "Counterfeit EC".
+-For some special devices, the method of prohibiting the original device from counterfeiting it will bring us convenience in adjusting the patch. Such as "OCI2C-TPXX Patch Method".
+-A certain device is disabled for some reason, but the MAC system needs it to work. See examples in `this chapter`.
+-In most cases, you can also enable the device by using "Binary Rename and Preset Variables".
 
-## 仿冒设备
+## Counterfeit Equipment
 
-- 特点
+-Features
   
-  - 被仿冒的设备在ACPI中已存在，相对代码短、少、独立存在。
+  -The counterfeit device already exists in ACPI, and the code is relatively short, few, and independent.
   
-  - 原始设备具有规范的 `_HID` 或者 `_CID` 。
-  - 即使原始设备未被禁用，使用仿冒设备的补丁也不会对ACPI造成伤害。
+  -The original device has the canonical `_HID` or `_CID`.
+  -Even if the original device is not disabled, using a counterfeit device patch will not cause ACPI damage.
   
-- 要求
+- Claim
 
-  - 仿冒设备名称和ACPI的原始设备名称**不同**。
+  -The name of the counterfeit device is **different** from the original device name of ACPI.
 
-  - 补丁内容和原始设备主要内容**相同**。
+  -The content of the patch is **same** as the main content of the original device.
 
-  - 仿冒补丁的 `_STA` 部分应包括以下内容，确保windows系统使用原始的ACPI。
+  -The `_STA` part of the counterfeit patch should include the following to ensure that the windows system uses the original ACPI.
 
     ```Swift
         Method (_STA, 0, NotSerialized)
@@ -42,10 +42,10 @@
         }
     ```
   
-- 示例
-  - ***SSDT-RTC0*** — 仿冒RTC
+-Example
+  -***SSDT-RTC0*** — Counterfeit RTC
 
-    - 原始设备名称：RTC
-    - _HID：PNP0B00
+    -Original device name: RTC
+    -_HID: PNP0B00
 
-    **注意** ： `LPCB` 名称应和原始ACPI名称一致。
+    **Note**: The name of `LPCB` should be consistent with the original ACPI name.
