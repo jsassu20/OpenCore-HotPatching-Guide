@@ -1,25 +1,25 @@
-# 禁用EHCx
+# Disable EHCx
 
-## 描述
+## Description
 
-下列情况之一需要禁用 EHC1 和 EHC2 总线：
+EHC1 and EHC2 buses need to be disabled in one of the following situations:
 
-- ACPI 包含 EHC1 或者 EHC2，而机器本身不存在相关硬件。
-- ACPI 包含 EHC1 或者 EHC2，机器存在相关硬件但并没有实际输出端口（外置和内置）。
+-ACPI includes EHC1 or EHC2, and the machine itself does not have related hardware.
+-ACPI includes EHC1 or EHC2, the machine has related hardware but no actual output port (external and internal).
 
-## 补丁
+## Patch
 
-- ***SSDT-EHC1_OFF***：禁用 `EHC1`。
-- ***SSDT-EHC2_OFF***：禁用 `EHC2`。
-- ***SSDT-EHCx_OFF***：是 ***SSDT-EHC1_OFF*** 和 ***SSDT-EHC2_OFF*** 的合并补丁。
+-***SSDT-EHC1_OFF***: Disable `EHC1`.
+-***SSDT-EHC2_OFF***: Disable `EHC2`.
+-***SSDT-EHCx_OFF***: It is a merged patch of ***SSDT-EHC1_OFF*** and ***SSDT-EHC2_OFF***.
 
-## 使用方法
+## Instructions
 
-- 优先 BIOS 设置：`XHCI Mode` = `Enabled`。
-- 如果 BIOS 没有 `XHCI Mode`选项，同时符合 **描述** 的情况之一，使用上述补丁。
+-Priority BIOS setting: `XHCI Mode` = `Enabled`.
+-If the BIOS does not have the `XHCI Mode` option, and it meets one of the conditions in **Description**, use the above patch.
 
-### 注意事项
+### Precautions
 
-- 适用于 7, 8, 9 系机器，且 macOS 是 10.11 以上版本。
-- 对于 7 系机器，***SSDT-EHC1_OFF*** 和 ***SSDT-EHC2_OFF*** 二者不可同时使用。
-- 补丁在 `Scope (\)`   下添加了 `_INI` 方法，如果和其他补丁的 `_INI` 发生重复，应合并 `_INI` 里的内容。
+-Applicable to machines of 7, 8, 9 series, and macOS is 10.11 or above.
+-For 7 series machines, ***SSDT-EHC1_OFF*** and ***SSDT-EHC2_OFF*** cannot be used at the same time.
+-The patch adds the `_INI` method under `Scope (\)`. If it overlaps with the `_INI` of other patches, the content in `_INI` should be merged.
