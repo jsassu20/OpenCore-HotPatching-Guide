@@ -1,34 +1,34 @@
-# CMOS相关
+# CMOS related
 
-## CMOS重置补丁
+## CMOS reset patch
 
-### 描述
+### Description
 
-- 某些机器在关机或者重启时会出现 **“开机自检错误”**，这是由于 CMOS 被重置所导致的。
-- 当使用 Clover 时，勾选 `ACPI\FixRTC` 可以解决上述问题。
-- 当使用 OpenCore 时，官方提供了以下解决方法，见 ***Sample.plist*** ：
-  - 安装 **RTCMemoryFixup.kext**
-  - `Kernel\Patch` 补丁：**__ZN11BCM5701Enet14getAdapterInfoEv**
-- 本章提供一种 SSDT 补丁方法来解决上述问题。这个 SSDT 补丁本质是仿冒 RTC，见《预置变量法》和《仿冒设备》。
+-Some machines will appear **"Power-on self-test error"** when shutting down or restarting, which is caused by the resetting of CMOS.
+-When using Clover, check `ACPI\FixRTC` to solve the above problems.
+-When using OpenCore, the following solutions are officially provided, see ***Sample.plist***:
+  -Install **RTCMemoryFixup.kext**
+  -`Kernel\Patch` patch: **__ZN11BCM5701Enet14getAdapterInfoEv**
+-This chapter provides an SSDT patch method to solve the above problems. This SSDT patch is essentially a counterfeit RTC, see "Preset Variable Method" and "Counterfeit Equipment".
 
-### 解决方案
+### solution
 
-详见《15-1-CMOS重置补丁》。
+See "15-1-CMOS Reset Patch" for details.
 
-## **CMOS** 内存和 RTCMemoryFixup
+## **CMOS** Memory and RTCMemoryFixup
 
-- 当 **AppleRTC** 与 **BIOS** 发生冲突而时，可以尝试使用 **RTCMemoryFixup** 模拟 **CMOS** 内存规避冲突。
-- **RTCMemoryFixup** 下载地址：<https://github.com/acidanthera/RTCMemoryFixup>
+-When **AppleRTC** and **BIOS** conflict, you can try to use **RTCMemoryFixup** to simulate **CMOS** memory to avoid the conflict.
+-**RTCMemoryFixup** download link: <https://github.com/acidanthera/RTCMemoryFixup>
 
-### **CMOS** 内存
+### **CMOS** Memory
 
-- **CMOS** 内存保存着日期、时间、硬件配置信息、辅助设置信息、启动设置、休眠信息等重要数据。
-- 一些 **CMOS** 内存空间定义：
-  - 日期、时间：`00-0D`
-  - 休眠信息存放区间：`80-AB`
-  - 电源管理：`B0-B4`
-  - 其他
+-**CMOS** The memory stores important data such as date, time, hardware configuration information, auxiliary settings information, startup settings, and sleep information.
+-Some **CMOS** memory space definitions:
+  -Date, time: `00-0D`
+  -Sleep information storage area: `80-AB`
+  -Power management: `B0-B4`
+  -Other
 
-### 模拟 **CMOS** 内存方法
+### Simulation **CMOS** memory method
 
-详见《15-2-CMOS内存和RTCMemoryFixup》。
+See "15-2-CMOS Memory and RTCMemoryFixup" for details.
