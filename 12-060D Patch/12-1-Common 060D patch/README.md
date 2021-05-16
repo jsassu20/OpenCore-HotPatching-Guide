@@ -11,12 +11,11 @@
 ### Parts that may require `0D/6D patch`
 
 -USB device
-
-  -`ADR` address: `0x001D0000`, part name: `EHC1` [Before 6th generation]
-  -`ADR` address: `0x001A0000`, part name: `EHC2` [Before 6th generation]
+  -`ADR` address: `0x001D0000`, part name: `EHC1`.
+  -`ADR` address: `0x001A0000`, part name: `EHC2`.
   -`ADR` address: `0x00140000`, part name: `XHC`, `XHCI`, `XHC1` etc.
-  -`ADR` address: `0x00140001`, part name: `XDCI`
-  -`ADR` address: `0x00140003`, part name: `CNVW`
+  -`ADR` address: `0x00140001`, part name: `XDCI`.
+  -`ADR` address: `0x00140003`, part name: `CNVW`.
 
 -Ethernet
 
@@ -111,4 +110,3 @@
 
 -The method described in this article is applicable to Hotpatch.
 -For any binary renaming used, the `System DSDT` file should be extracted for verification.
--HP machine `06/0D` patch is special, please refer to "12-2-HP Special 060D Patch" for details
