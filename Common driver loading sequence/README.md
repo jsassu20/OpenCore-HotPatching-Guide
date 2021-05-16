@@ -1,5 +1,5 @@
-# 常见驱动加载顺序
+# Common driver loading sequence
 
-## 需要注意事项
+## Need to pay attention to
 
-- `config-5-PS2Smart键盘驱动列表` 与`config-2-PS2键盘驱动列表` 二选一，不可同时使用，建议优先选用 config-2-PS2 键盘驱动列表
+-Choose one of `config-5-PS2Smart keyboard driver list` and `config-2-PS2 keyboard driver list`. Cannot be used at the same time. It is recommended to use config-2-PS2 keyboard driver list first

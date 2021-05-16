@@ -1,58 +1,58 @@
-# SSDT 屏蔽独显方法
+# SSDT Shielding independent display method
 
-## 二种屏蔽独显方法
+## Two ways to block independent display
 
-- `config` 方法
+-`config` method
 
-  - `DeviceProperties\Add\PciRoot(0x0)/Pci(0x2,0x0)` 添加
-
-    ```text
-    disable-external-gpu  01000000
-    ```
-
-  - 添加引导参数
+  -`DeviceProperties\Add\PciRoot(0x0)/Pci(0x2,0x0)` add
 
     ```text
-    boot-args             -wegnoegpu
+    disable-external-gpu 01000000
     ```
 
-- **本方法** —— SSDT 屏蔽独显方法
+  -Add boot parameters
 
-## SSDT屏蔽独显过程
+    ```text
+    boot-args -wegnoegpu
+    ```
 
-- 初始化阶段禁用独显。
-- 机器睡眠期间启用独显，防止独显在被禁用状态下进入 `S3` 而可能导致的系统崩溃。
-- 机器唤醒后再次禁用独显。
+-**This method** —— SSDT shielding independent display method
 
-## 补丁组合
+## SSDT shielding independent display process
 
-- 综合补丁—— ***SSDT-PTSWAK***
-- 屏蔽独显补丁—— ***SSDT-NDGP_OFF*** 【或者 ***SSDT-NDGP_PS3*** 】
+-Disable independent display during the initialization phase.
+-Enable independent display during machine sleep to prevent the system from crashing when the independent display enters `S3` when it is disabled.
+-Disable the independent display again after the machine wakes up.
 
-## 示例
+## Patch Combination
 
-- ***SSDT-PTSWAK***
+-Comprehensive patch-***SSDT-PTSWAK***
+-Shield independent display patch—— ***SSDT-NDGP_OFF*** [or ***SSDT-NDGP_PS3***]
 
-  略，详见《PTSWAK综合扩展补丁》。
+## Example
+
+-***SSDT-PTSWAK***
+
+  Slightly, see "PTSWAK Comprehensive Extension Patch" for details.
   
-- ***SSDT-NDGP_OFF***
+-***SSDT-NDGP_OFF***
 
-  - 查询独显的名称和路径，确认其存在 `_ON` 和 `_OFF` 方法
-  - 参考示例，修改其名称和路径同查询结果一致
+  -Query the name and path of the unique display and confirm the existence of the `_ON` and `_OFF` methods
+  -Refer to the example, modify its name and path to be consistent with the query result
   
-- ***SSDT-NDGP_PS3***
+-***SSDT-NDGP_PS3***
 
-  - 查询独显的名称和路径，确认其存在 `_PS0`  、 `_PS3` 和 `_DSM` 方法
-  - 参考示例，修改其名称和路径同查询结果一致
+  -Query the name and path of the independent display and confirm the existence of the `_PS0`, `_PS3` and `_DSM` methods
+  -Refer to the example, modify its name and path to be consistent with the query result
   
-- **注意**
+-**Attention**
 
-  - 查询独显名称和路径以及 `_ON` 、 `_OFF` 、 `_PS0` 、 `_PS3` 和 `_DSM` 时，应对全部 `ACPI` 文件进行搜索，它可能存在于 `DSDT` 文件中，也可能存在于 `ACPI` 的其他 `SSDT` 文件中。
-  - 示例中的独显名称和路径是： `_SB.PCI0.RP13.PXSX` 。
+  -When querying the unique name and path as well as `_ON`, `_OFF`, `_PS0`, `_PS3` and `_DSM`, all `ACPI` files should be searched. It may exist in the `DSDT` file, or it may Exist in other `SSDT` files of `ACPI`.
+  -The unique name and path in the example is: `_SB.PCI0.RP13.PXSX`.
 
-## 注意事项
+## Precautions
 
-- 按照 **补丁组合** 要求，须同时使用 ***SSDT-PTSWAK*** 和 ***SSDT-NDGP_OFF*** 【或者 ***SSDT-NDGP_PS3*** 】
-- 如果 ***SSDT-NDGP_OFF*** 和 ***SSDT-NDGP_PS3*** 均满足使用要求，优先使用 ***SSDT-NDGP_OFF***
+-According to the requirements of **patch combination**, ***SSDT-PTSWAK*** and ***SSDT-NDGP_OFF*** must be used at the same time [or ***SSDT-NDGP_PS3***]
+-If both ***SSDT-NDGP_OFF*** and ***SSDT-NDGP_PS3*** meet the usage requirements, use ***SSDT-NDGP_OFF*** first
 
-**注** ：以上主要内容来自 [@RehabMan](https://github.com/rehabman)
+**Note**: The above main content comes from [@RehabMan](https://github.com/rehabman)
