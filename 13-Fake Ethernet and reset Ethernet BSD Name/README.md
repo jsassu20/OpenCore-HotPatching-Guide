@@ -1,24 +1,24 @@
-# 仿冒以太网
+# Counterfeit Ethernet
 
-## 描述
+## Description
 
-一些机器无以太网，仿冒以太网实现APP正常下载功能。
+Some machines don't have Ethernet, imitating Ethernet to realize normal APP download function.
 
-## 使用
+## Use
 
-- 添加 ***SSDT-LAN*** 至 `OC\ACPI` 。
+-Add ***SSDT-LAN*** to `OC\ACPI`.
 
-- 添加 **NullEthernet.kext** 至 `OC\Kexts` 。
+-Add **NullEthernet.kext** to `OC\Kexts`.
 
-- 在config中添加相关列表。
+-Add related lists in config.
 
-## 附：重置以太网 `BSD Name` 为`en0`
+## Attachment: Reset the Ethernet `BSD Name` to `en0`
 
-- 打开 **系统偏好设置** 的 **网络** 。
-- 删除所有网络，如图《清除所有网络》。
-- 删除 `资源库\Preferences\SystemConfiguration\NetworkInterfaces.plist` 文件。
-- 重启。
-- 再次进入系统后，再次打开 **系统偏好设置** 的 **网络** 。
-- 依次按顺序添加 **以太网** 和其他需要的网络，点击 **应用**。
+-Open **Network** in **System Preferences**.
+-Delete all networks, as shown in "Clear All Networks".
+-Delete the `Resource Library\Preferences\SystemConfiguration\NetworkInterfaces.plist` file.
+-Restart.
+-After entering the system again, open **Network** of **System Preferences** again.
+-Add **Ethernet** and other required networks in sequence, and click **Apply**.
 
 ![](https://raw.githubusercontent.com/athlonreg/BlogImages/master/ClearNet.png)
